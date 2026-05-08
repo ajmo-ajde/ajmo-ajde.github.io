@@ -143,7 +143,7 @@
         
         <!-- Dugme sa wrapperom za note -->
         <div class="muzika-dugme-wrapper">
-            <button class="muzika-dugme pulse" id="musicBtn" onclick="pokreniMuziku()">
+            <button class="muzika-dugme pulse" id="musicBtn">
                 🧳 Ajde 🚗
             </button>
         </div>
@@ -155,7 +155,7 @@
     </audio>
 
     <script>
-        // IZMJENJEN TEKST
+        // TEKST KOJI CE SE ISPISIVATI NAKON KLIKA
         const poruka = `Ajmo do Beča sredinom Oktobra. Biće tamo i ... tih dana. Ponesi osmeh. Za sve ostalo ćemo lako.`;
         
         const karakteri = poruka.split("");
@@ -164,6 +164,7 @@
         let pauzaIzmedjuKaraktera = 180;
         let pauzaNaKraju = 7000;
         let treperi = null;
+        let tekstZapocet = false; // Da li je tekst već počeo da se ispisuje
         
         // Varijable za note
         let noteInterval = null;
@@ -223,40 +224,6 @@
             }
         }
         
-        // === FUNKCIJA ZA MUZIKU ===
-        const audio = document.getElementById("audio");
-
-        function pokreniMuziku() {
-            if (musicStarted) return; // Spriječi višestruko pokretanje
-            
-            musicStarted = true;
-            audio.currentTime = 0;
-            audio.play();
-            
-            // Zaustavi animaciju nota
-            stopNoteAnimation();
-            
-            // Ukloni pulse klasu sa dugmeta
-            btn.classList.remove('pulse');
-            
-            // Dodaj mali efekat na dugme nakon klika
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                btn.style.transform = '';
-            }, 200);
-        }
-
-        // Pokretanje teksta i animacije nota
-        window.addEventListener('load', () => {
-            dodajKursor();
-            setTimeout(prikaziSlovoPoSlovo, 800);
-            
-            // Pokreni animaciju nota nakon 1.5 sekundi
-            setTimeout(() => {
-                startNoteAnimation();
-            }, 1500);
-        });
-        
         // Funkcije za kursor
         function dodajKursor() {
             if (treperi) treperi.remove();
@@ -289,11 +256,59 @@
                 setTimeout(() => {
                     ocistiTekst();
                     index = 0;
+                    tekstZapocet = false; // Resetuj stanje - čekamo novi klik
                     dodajKursor();
-                    prikaziSlovoPoSlovo();
+                    // Ne pokreći automatski ponovo, čekamo novi klik
                 }, pauzaNaKraju);
             }
         }
+        
+        // Funkcija koja pokreće sve - MUZIKU I TEKST
+        function pokreniSve() {
+            if (musicStarted) return; // Spriječi višestruko pokretanje
+            
+            musicStarted = true;
+            
+            // Pokreni muziku
+            audio.currentTime = 0;
+            audio.play();
+            
+            // Zaustavi animaciju nota
+            stopNoteAnimation();
+            
+            // Ukloni pulse klasu sa dugmeta
+            btn.classList.remove('pulse');
+            
+            // Dodaj mali efekat na dugme nakon klika
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 200);
+            
+            // Pokreni ispisivanje teksta (samo ako nije već počelo)
+            if (!tekstZapocet) {
+                tekstZapocet = true;
+                index = 0;
+                ocistiTekst();
+                dodajKursor();
+                prikaziSlovoPoSlovo();
+            }
+        }
+
+        // === POSTAVI DOGADJAJ ZA KLIK NA DUGME ===
+        btn.addEventListener("click", pokreniSve);
+
+        // Pokretanje animacije nota odmah pri učitavanju
+        window.addEventListener('load', () => {
+            // Dodaj kursor ali ga sakrij dok ne počne tekst
+            dodajKursor();
+            ukloniKursor(); // Sakrij kursor dok ne klikne
+            
+            // Pokreni animaciju nota nakon 1 sekunde
+            setTimeout(() => {
+                startNoteAnimation();
+            }, 1000);
+        });
     </script>
 </body>
 </html>
