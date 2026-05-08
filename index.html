@@ -155,7 +155,7 @@
     </audio>
 
     <script>
-        // TEKST KOJI CE SE ISPISIVATI NAKON KLIKA
+        // TEKST KOJI SE ISPISUJE
         const poruka = `Ajmo do Beča sredinom Oktobra. Biće tamo i ... tih dana. Ponesi osmeh. Za sve ostalo ćemo lako.`;
         
         const karakteri = poruka.split("");
@@ -164,7 +164,7 @@
         let pauzaIzmedjuKaraktera = 180;
         let pauzaNaKraju = 7000;
         let treperi = null;
-        let tekstZapocet = false; // Da li je tekst već počeo da se ispisuje
+        let tekstAktivan = false; // Da li je trenutno ispisivanje teksta aktivno
         
         // Varijable za note
         let noteInterval = null;
@@ -175,10 +175,6 @@
         function createNote() {
             const wrapper = document.querySelector('.muzika-dugme-wrapper');
             const button = document.querySelector('.muzika-dugme');
-            
-            // Dobijamo poziciju dugmeta
-            const btnRect = button.getBoundingClientRect();
-            const wrapperRect = wrapper.getBoundingClientRect();
             
             // Kreiranje note elementa
             const note = document.createElement('div');
@@ -198,10 +194,6 @@
             const randomSize = 1.2 + Math.random() * 1;
             note.style.fontSize = `${randomSize}rem`;
             
-            // Random rotacija
-            const randomRotate = (Math.random() - 0.5) * 30;
-            note.style.setProperty('--rotate', `${randomRotate}deg`);
-            
             wrapper.appendChild(note);
             
             // Ukloni notu nakon animacije
@@ -213,7 +205,7 @@
         // Pokretanje animacije nota
         function startNoteAnimation() {
             if (noteInterval) clearInterval(noteInterval);
-            noteInterval = setInterval(createNote, 400); // Nova nota svakih 0.4 sekunde
+            noteInterval = setInterval(createNote, 400);
         }
         
         // Zaustavljanje animacije nota
@@ -252,18 +244,20 @@
                 dodajKursor();
                 setTimeout(prikaziSlovoPoSlovo, pauzaIzmedjuKaraktera);
             } else {
+                // Kada dođe do kraja teksta
                 ukloniKursor();
+                
+                // Sačekaj 7 sekundi pa kreni ispočetka (automatski)
                 setTimeout(() => {
                     ocistiTekst();
                     index = 0;
-                    tekstZapocet = false; // Resetuj stanje - čekamo novi klik
                     dodajKursor();
-                    // Ne pokreći automatski ponovo, čekamo novi klik
+                    prikaziSlovoPoSlovo();  // Automatski kreni ponovo
                 }, pauzaNaKraju);
             }
         }
         
-        // Funkcija koja pokreće sve - MUZIKU I TEKST
+        // Funkcija koja pokreće sve - MUZIKU I TEKST (samo prvi put)
         function pokreniSve() {
             if (musicStarted) return; // Spriječi višestruko pokretanje
             
@@ -285,10 +279,9 @@
                 btn.style.transform = '';
             }, 200);
             
-            // Pokreni ispisivanje teksta (samo ako nije već počelo)
-            if (!tekstZapocet) {
-                tekstZapocet = true;
-                index = 0;
+            // Pokreni ispisivanje teksta (samo prvi put)
+            if (!tekstAktivan) {
+                tekstAktivan = true;
                 ocistiTekst();
                 dodajKursor();
                 prikaziSlovoPoSlovo();
