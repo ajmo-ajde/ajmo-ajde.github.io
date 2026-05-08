@@ -93,8 +93,8 @@
         <div class="srce">💗</div>
         <p id="tekst"></p>
         
-        <!-- Dugme: Kofer + Ajde + Auto -->
-        <button class="muzika-dugme" onclick="pokreniMuziku()">
+        <!-- Dugme: Kofer + Ajde + Auto - sada otvara PDF -->
+        <button class="muzika-dugme" onclick="otvoriPDFiPustiMuziku()">
             🧳 Ajde 🚗
         </button>
     </div>
@@ -152,12 +152,21 @@
             }
         }
 
-        // === FUNKCIJA ZA MUZIKU ===
+        // === MUZIKA I PDF ===
         const audio = document.getElementById("audio");
 
         function pokreniMuziku() {
-            audio.currentTime = 0;     // kreće OD POČETKA
+            audio.currentTime = 0;
             audio.play();
+        }
+        
+        // NOVA FUNKCIJA: Otvara PDF u novom tabu i pušta muziku
+        function otvoriPDFiPustiMuziku() {
+            // Otvaranje PDF fajla u novom tabu
+            window.open('ulaznice.pdf', '_blank');
+            
+            // Puštanje muzike
+            pokreniMuziku();
         }
 
         // Pokretanje teksta
